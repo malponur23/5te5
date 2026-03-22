@@ -1,0 +1,17 @@
+services:
+  - type: worker
+    name: namaz-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: GROUP_CHAT_ID
+        sync: false
+      - key: DB_PATH
+        value: /data/namaz_bot.db
+    disk:
+      name: bot-data
+      mountPath: /data
+      sizeGB: 1
