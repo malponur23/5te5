@@ -254,7 +254,9 @@ def schedule_prayers(app):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def main():
+import asyncio
+
+async def main():
     db.init()
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start",    cmd_start))
@@ -264,7 +266,10 @@ def main():
     app.add_handler(CallbackQueryHandler(button_callback))
     schedule_prayers(app)
     logger.info("Bot başlatıldı 🕌")
-    app.run_polling(drop_pending_updates=True)
+    async with app:
+        await app.start()
+        await app.updater.start_polling(drop_pending_updates=True)
+        await asyncio.Event().wait()  # sonsuza kadar çalış
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
