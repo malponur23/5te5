@@ -1,9 +1,12 @@
 import sqlite3
 import os
 import logging
+from datetime import datetime, timedelta
+import pytz
 
 logger = logging.getLogger(__name__)
 DB_PATH = os.environ.get("DB_PATH", "namaz_bot.db")
+TIMEZONE = "Europe/Istanbul"
 
 
 class Database:
@@ -56,7 +59,7 @@ class Database:
         with self._conn() as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
-                SELECT first_name,
+                SELECT user_id, first_name,
                     SUM(CASE WHEN status='kildi'   THEN 1 ELSE 0 END) AS kildi,
                     SUM(CASE WHEN status='kaza'    THEN 1 ELSE 0 END) AS kaza,
                     SUM(CASE WHEN status='kilmadi' THEN 1 ELSE 0 END) AS kilmadi
@@ -81,6 +84,13 @@ class Database:
             """).fetchall()
         return [dict(r) for r in rows]
 
+    def get_user_id_by_name(self, first_name):
+        with self._conn() as conn:
+            row = conn.execute("""
+                SELECT user_id FROM prayers WHERE first_name=? LIMIT 1
+            """, (first_name,)).fetchone()
+        return row[0] if row else None
+
     def get_weekly_summary(self, dates):
         placeholders = ",".join("?" * len(dates))
         with self._conn() as conn:
@@ -102,6 +112,38 @@ class Database:
                 "kildi": r["kildi"], "kaza": r["kaza"], "kilmadi": r["kilmadi"]
             }
         return result
+
+    def get_user_daily_scores(self, user_id, days=60):
+        """Kullanıcının son N gündeki günlük namaz sayısını döner {date: score}"""
+        tz   = pytz.timezone(TIMEZONE)
+        today = datetime.now(tz).date()
+        dates = [(today - timedelta(days=i)).isoformat() for i in range(days)]
+        placeholders = ",".join("?" * len(dates))
+        with self._conn() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(f"""
+                SELECT date,
+                    SUM(CASE WHEN status IN ('kildi','kaza') THEN 1 ELSE 0 END) AS done
+                FROM prayers
+                WHERE user_id=? AND date IN ({placeholders})
+                GROUP BY date
+            """, [user_id] + dates).fetchall()
+        return {r["date"]: r["done"] for r in rows}
+
+    def get_max_streak(self, user_id):
+        """Kullanıcının tüm zamanların en uzun streakini hesapla."""
+        scores = self.get_user_daily_scores(user_id, days=365)
+        tz     = pytz.timezone(TIMEZONE)
+        today  = datetime.now(tz).date()
+        max_s  = cur = 0
+        for i in range(365):
+            d = (today - timedelta(days=i)).isoformat()
+            if scores.get(d, 0) == 5:
+                cur += 1
+                max_s = max(max_s, cur)
+            else:
+                cur = 0
+        return max_s
 
     def save_notification_message(self, prayer_key, date, message_id, prayer_time_str, is_reminder):
         with self._conn() as conn:
