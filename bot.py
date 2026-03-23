@@ -48,7 +48,16 @@ HARAM_BAKIS_MESAJLARI = [
     '👁️ *"İlk bakış sana, ikincisi aleyhinedir."*\n_(Hadis-i Şerif, Ebu Davud)_',
     '👁️ *"Gözler de zina eder; onların zinası bakmaktır."*\n_(Hadis-i Şerif, Buhari)_',
     '👁️ *"Kim Allah korkusundan dolayı bir harama bakmaktan gözünü çekerse, Allah ona imanın lezzetini tattırır."*\n_(Hadis-i Şerif)_',
-    '👁️ Harama bakmak kalbi karartır. Gözünü koru, kalbini koru. 🤲',
+    '👁️ *"Mü\'min kadınlara da söyle: Gözlerini haramdan sakınsınlar, iffetlerini korusunlar."*\n_(Nur Suresi, 31)_',
+    '👁️ *"Şüphesiz kulak, göz ve kalp; bunların hepsi sorguya çekilecektir."*\n_(İsra Suresi, 36)_',
+    '👁️ *"Harama bakmak şeytanın zehirli oklarından bir oktur. Kim Allah korkusuyla onu terk ederse, Allah ona kalbinde lezzet duyacağı bir iman verir."*\n_(Hadis-i Şerif)_',
+    '👁️ *"Gözünü haramdan koru ki, Allah\'ın sana verdiği nimetlerin kadrini bilesin."*\n_(İslam Âlimleri)_',
+    '👁️ *"Dikkat edin! Vücutta bir et parçası vardır; o iyi olursa bütün vücut iyi olur, o bozulursa bütün vücut bozulur. Dikkat edin, o kalptir."*\n_(Hadis-i Şerif, Buhari)_\n\nKalbi korumanın yolu gözü korumaktan geçer. 🤲',
+    '👁️ *"Allah\'tan hakkıyla hayâ edin."*\n_(Tirmizi)_\n\nHayânın başı gözü haramdan korumaktır.',
+    '👁️ *"Ey Ademoğlu! Gözün sana emanettir, onu iyi koru."*\n_(İslam Âlimleri)_',
+    '👁️ Göz, kalbin penceresidir. Harama açılan bir pencere, kalbi karartır. Gözünü koru, kalbini koru. 🤲',
+    '👁️ *"Kim nefsini şehvetlerden korursa, işte cennet onun yurdudur."*\n_(Naziat Suresi, 40-41)_',
+    '👁️ *"Şüphesiz Allah, gizlice yapılanı da, açıkça yapılanı da bilir."*\n_(Nahl Suresi, 19)_\n\nYalnız olduğunda da Allah görüyor. 👁️',
 ]
 
 AYET_UYARILARI = [
@@ -588,10 +597,14 @@ def schedule_prayers(app):
     app.job_queue.run_daily(send_weekly_report,  time=time(23, 59, tzinfo=tz), days=(6,), name="weekly_report")
     app.job_queue.run_daily(send_monthly_report, time=time(23, 58, tzinfo=tz), days=(6,), name="monthly_check")
     app.job_queue.run_daily(send_friday_reminder,time=time(9, 0,  tzinfo=tz),  days=(4,), name="friday_reminder")
-    # Harama bakış hatırlatması — günde 3 kez (sabah, öğle arası, gece)
-    app.job_queue.run_daily(send_haram_reminder, time=time(10, 0, tzinfo=tz), name="haram_reminder_1")
-    app.job_queue.run_daily(send_haram_reminder, time=time(15, 0, tzinfo=tz), name="haram_reminder_2")
-    app.job_queue.run_daily(send_haram_reminder, time=time(21, 0, tzinfo=tz), name="haram_reminder_3")
+    # Harama bakış hatırlatması — gündüz 3, akşam 4 (18:00 sonrası sık)
+    app.job_queue.run_daily(send_haram_reminder, time=time(9,  0, tzinfo=tz), name="haram_reminder_1")
+    app.job_queue.run_daily(send_haram_reminder, time=time(12, 0, tzinfo=tz), name="haram_reminder_2")
+    app.job_queue.run_daily(send_haram_reminder, time=time(15, 0, tzinfo=tz), name="haram_reminder_3")
+    app.job_queue.run_daily(send_haram_reminder, time=time(18, 0, tzinfo=tz), name="haram_reminder_4")
+    app.job_queue.run_daily(send_haram_reminder, time=time(19,30, tzinfo=tz), name="haram_reminder_5")
+    app.job_queue.run_daily(send_haram_reminder, time=time(21, 0, tzinfo=tz), name="haram_reminder_6")
+    app.job_queue.run_daily(send_haram_reminder, time=time(22,30, tzinfo=tz), name="haram_reminder_7")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
