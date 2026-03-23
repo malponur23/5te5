@@ -153,6 +153,15 @@ class Database:
             """, (prayer_key, date, message_id, prayer_time_str, int(is_reminder)))
             conn.commit()
 
+    def get_user_prayer_status(self, user_id, prayer_key, date):
+        """Kullanıcının belirli bir namazın mevcut statüsünü döner."""
+        with self._conn() as conn:
+            row = conn.execute("""
+                SELECT status FROM prayers
+                WHERE user_id=? AND prayer_key=? AND date=?
+            """, (user_id, prayer_key, date)).fetchone()
+        return row[0] if row else None
+
     def get_user_today_detail(self, user_id, date):
         """Kullanıcının bugün hangi vakitleri kıldığını döner."""
         with self._conn() as conn:
