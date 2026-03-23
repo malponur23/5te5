@@ -99,6 +99,25 @@ def build_text(prayer_key, prayer_time_str, is_reminder, date, is_urgent=False, 
         lines.append(f"  {icon} {u['first_name']}")
     return header + "\n".join(lines)
 
+def get_active_prayer(times: dict) -> tuple:
+    """
+    Şu an aktif olan (vakti girmiş ama bir sonraki girmemiş) namazı döner.
+    (prayer_key, prayer_time_str) veya (None, None)
+    """
+    now = datetime.now(tz)
+    active_key = None
+    active_time = None
+    for pk in PRAYER_ORDER:
+        ts = times.get(pk)
+        if not ts:
+            continue
+        h, m = map(int, ts.split(":"))
+        prayer_dt = tz.localize(datetime.combine(now.date(), time(h, m)))
+        if prayer_dt <= now:
+            active_key  = pk
+            active_time = ts
+    return active_key, active_time
+
 def get_streak(user_id):
     history = db.get_user_daily_scores(user_id, days=60)
     streak  = 0
@@ -134,41 +153,60 @@ async def send_prayer_notification(context: ContextTypes.DEFAULT_TYPE):
     db.save_notification_message(pk, date, msg.message_id, pts, False)
 
 async def send_prayer_reminder(context: ContextTypes.DEFAULT_TYPE):
-    """1 saat öncesi hatırlatma."""
-    pk   = context.job.data["prayer_key"]
-    pts  = context.job.data["prayer_time_str"]
+    """1 saat öncesi hatırlatma — bir sonraki vakti değil, AKTİF vakti sorar."""
+    pts  = context.job.data["prayer_time_str"]  # bir sonraki vaktin saati (bilgi amaçlı)
     date = datetime.now(tz).date().isoformat()
+    times = get_prayer_times_today()
+
+    # Şu an hangi vakit aktif?
+    active_pk, active_pts = get_active_prayer(times)
+    if not active_pk:
+        return  # Henüz hiçbir vakit girmemiş (sabahtan önce)
 
     all_users  = db.get_all_known_users()
-    detail     = db.get_prayer_detail_today(date, pk)
+    detail     = db.get_prayer_detail_today(date, active_pk)
     marked_ids = {r["user_id"] for r in detail}
     if all_users and all(u["user_id"] in marked_ids for u in all_users):
         return
 
+    next_name = PRAYER_NAMES[context.job.data["prayer_key"]]
+    text = (
+        f"⏰ *{next_name} Vaktine 1 Saat Kaldı!*\n"
+        f"Vakit: `{pts}`\n\n"
+    ) + build_text(active_pk, active_pts, True, date)
+
     msg = await context.bot.send_message(
-        chat_id=GROUP_CHAT_ID, text=build_text(pk, pts, True, date),
-        reply_markup=keyboard(pk), parse_mode="Markdown"
+        chat_id=GROUP_CHAT_ID, text=text,
+        reply_markup=keyboard(active_pk), parse_mode="Markdown"
     )
-    db.save_notification_message(pk, date, msg.message_id, pts, True)
+    db.save_notification_message(active_pk, date, msg.message_id, active_pts, True)
 
 async def send_urgent_reminder(context: ContextTypes.DEFAULT_TYPE):
-    """30 dakika öncesi sert uyarı."""
-    pk   = context.job.data["prayer_key"]
-    pts  = context.job.data["prayer_time_str"]
-    date = datetime.now(tz).date().isoformat()
+    """30 dakika öncesi sert uyarı — AKTİF vakti sorar, gelecek vakti değil."""
+    pts   = context.job.data["prayer_time_str"]
+    date  = datetime.now(tz).date().isoformat()
+    times = get_prayer_times_today()
+
+    active_pk, active_pts = get_active_prayer(times)
+    if not active_pk:
+        return
 
     all_users  = db.get_all_known_users()
-    detail     = db.get_prayer_detail_today(date, pk)
+    detail     = db.get_prayer_detail_today(date, active_pk)
     marked_ids = {r["user_id"] for r in detail}
     if all_users and all(u["user_id"] in marked_ids for u in all_users):
         return
 
+    next_name = PRAYER_NAMES[context.job.data["prayer_key"]]
+    text = (
+        f"🔴 *{next_name} Vaktine 30 Dakika Kaldı!*\n\n"
+    ) + build_text(active_pk, active_pts, False, date, is_urgent=True)
+
     msg = await context.bot.send_message(
-        chat_id=GROUP_CHAT_ID,
-        text=build_text(pk, pts, False, date, is_urgent=True),
-        reply_markup=keyboard(pk), parse_mode="Markdown"
+        chat_id=GROUP_CHAT_ID, text=text,
+        reply_markup=keyboard(active_pk), parse_mode="Markdown"
     )
-    db.save_notification_message(pk, date, msg.message_id, pts, False)
+    db.save_notification_message(active_pk, date, msg.message_id, active_pts, False)
 
 async def send_post_prayer_reminder(context: ContextTypes.DEFAULT_TYPE):
     """Vakit girdikten 30 dk sonra kılmadıysan uyar."""
@@ -239,6 +277,20 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _, status, prayer_key = parts
     user  = query.from_user
     date  = datetime.now(tz).date().isoformat()
+
+    # Vakti gelmediyse butona basılamaz
+    times = get_prayer_times_today()
+    ts    = times.get(prayer_key)
+    if ts:
+        h, m = map(int, ts.split(":"))
+        prayer_dt = tz.localize(datetime.combine(datetime.now(tz).date(), time(h, m)))
+        if datetime.now(tz) < prayer_dt:
+            prayer_name = PRAYER_NAMES[prayer_key]
+            await query.answer(
+                f"⏳ {prayer_name} vakti henüz girmedi! ({ts})",
+                show_alert=True
+            )
+            return
 
     # Zaten aynı statüde kayıt varsa tekrar sayma
     existing = db.get_user_prayer_status(user.id, prayer_key, date)
