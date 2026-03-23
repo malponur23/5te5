@@ -42,10 +42,9 @@ TESELLI = [
     "Allah affedicidir, bir sonrakinde daha dikkatli ol! 🌙",
 ]
 
-# Namaz kılmayanlar için sert uyarı ayetleri (30 dk öncesi)
 AYET_UYARILARI = [
     '⚠️ *"Yazıklar olsun o namaz kılanlara ki, namazlarından gafildirler."*\n_(Maun 4-5)_\n\nHenüz işaretlemedin! Namazını kıldıysan işaretle 👇',
-    '⚠️ *"Sizi şu yanık ateşe ne sürükledi? Derler ki: Biz namaz kılanlardan değildik."*\n_(Müddessir 42-43)_\n\nNamazını kılmadıysan hâlâ vakit var! 👇',
+    '⚠️ *"Sizi şu yanık ateşe ne sürükledi? Biz namaz kılanlardan değildik."*\n_(Müddessir 42-43)_\n\nNamazını kılmadıysan hâlâ vakit var! 👇',
     '⚠️ *"Namazı terk etmek, küfür ile şirk arasındaki sınırdır."*\n_(Hadis-i Şerif)_\n\nBu namazı kaçırma! 👇',
     '⚠️ *"Kıyamet günü kulun ilk hesaba çekileceği ameli namazdır."*\n_(Hadis-i Şerif)_\n\nVakit geçmeden kıl veya işaretle! 👇',
 ]
@@ -59,15 +58,28 @@ def keyboard(prayer_key):
         [InlineKeyboardButton("🔄 Kaza Olarak İşaretle", callback_data=f"pray|kaza|{prayer_key}")]
     ])
 
+def bulk_keyboard(date):
+    """Bulk ekleme için her namaz için butonlar."""
+    rows = []
+    for pk in PRAYER_ORDER:
+        name = PRAYER_NAMES[pk]
+        rows.append([
+            InlineKeyboardButton(f"✅ {name}", callback_data=f"bulk|kildi|{pk}|{date}"),
+            InlineKeyboardButton(f"🔄 Kaza",   callback_data=f"bulk|kaza|{pk}|{date}"),
+        ])
+    rows.append([InlineKeyboardButton("✅ Tümünü Kıldım", callback_data=f"bulk|all|all|{date}")])
+    return InlineKeyboardMarkup(rows)
+
 def progress(done, total=5):
     return "█" * min(done, total) + "░" * (total - min(done, total))
 
-def build_text(prayer_key, prayer_time_str, is_reminder, date, is_urgent=False):
+def build_text(prayer_key, prayer_time_str, is_reminder, date, is_urgent=False, is_post=False):
     name = PRAYER_NAMES[prayer_key]
 
     if is_urgent:
-        header = random.choice(AYET_UYARILARI)
-        header = f"🔴 *{name} — 30 Dakika Kaldı!*\n\n" + header
+        header = f"🔴 *{name} — 30 Dakika Kaldı!*\n\n" + random.choice(AYET_UYARILARI)
+    elif is_post:
+        header = f"🕐 *{name} Namazını kıldınız mı?*\nVakit gireli biraz oldu, henüz işaretlemediniz 👇"
     elif is_reminder:
         header = f"⏰ *{name} Hatırlatması*\nVakit: `{prayer_time_str}` yaklaşıyor!\n\nKıldın mı? İşaretlemedin 👇"
     else:
@@ -140,7 +152,7 @@ async def send_prayer_reminder(context: ContextTypes.DEFAULT_TYPE):
     db.save_notification_message(pk, date, msg.message_id, pts, True)
 
 async def send_urgent_reminder(context: ContextTypes.DEFAULT_TYPE):
-    """30 dakika öncesi sert uyarı — sadece işaretlemeyenlere."""
+    """30 dakika öncesi sert uyarı."""
     pk   = context.job.data["prayer_key"]
     pts  = context.job.data["prayer_time_str"]
     date = datetime.now(tz).date().isoformat()
@@ -148,15 +160,31 @@ async def send_urgent_reminder(context: ContextTypes.DEFAULT_TYPE):
     all_users  = db.get_all_known_users()
     detail     = db.get_prayer_detail_today(date, pk)
     marked_ids = {r["user_id"] for r in detail}
-
-    # Sadece işaretlemeyenler varsa gönder
-    unmarked = [u for u in all_users if u["user_id"] not in marked_ids]
-    if not unmarked:
+    if all_users and all(u["user_id"] in marked_ids for u in all_users):
         return
 
     msg = await context.bot.send_message(
         chat_id=GROUP_CHAT_ID,
         text=build_text(pk, pts, False, date, is_urgent=True),
+        reply_markup=keyboard(pk), parse_mode="Markdown"
+    )
+    db.save_notification_message(pk, date, msg.message_id, pts, False)
+
+async def send_post_prayer_reminder(context: ContextTypes.DEFAULT_TYPE):
+    """Vakit girdikten 30 dk sonra kılmadıysan uyar."""
+    pk   = context.job.data["prayer_key"]
+    pts  = context.job.data["prayer_time_str"]
+    date = datetime.now(tz).date().isoformat()
+
+    all_users  = db.get_all_known_users()
+    detail     = db.get_prayer_detail_today(date, pk)
+    marked_ids = {r["user_id"] for r in detail}
+    if all_users and all(u["user_id"] in marked_ids for u in all_users):
+        return
+
+    msg = await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID,
+        text=build_text(pk, pts, False, date, is_post=True),
         reply_markup=keyboard(pk), parse_mode="Markdown"
     )
     db.save_notification_message(pk, date, msg.message_id, pts, False)
@@ -168,18 +196,55 @@ async def send_friday_reminder(context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-# ── Buton ─────────────────────────────────────────────────────────────────────
+# ── Buton callback ────────────────────────────────────────────────────────────
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     parts = query.data.split("|")
+
+    # ── Bulk ekleme butonu
+    if parts[0] == "bulk":
+        _, status, pk, date = parts
+        user = query.from_user
+
+        if pk == "all":
+            # Tüm namazları kıldım olarak ekle
+            for p in PRAYER_ORDER:
+                db.record_prayer(user.id, user.username or user.first_name,
+                                 user.first_name, p, "kildi", date)
+            await query.answer("✅ Tüm namazlar kıldım olarak işaretlendi! Allah kabul etsin 🤲", show_alert=True)
+        else:
+            db.record_prayer(user.id, user.username or user.first_name,
+                             user.first_name, pk, status, date)
+            name = PRAYER_NAMES[pk]
+            txt  = {"kildi": f"✅ {name} kıldım olarak işaretlendi.", "kaza": f"🔄 {name} kaza olarak işaretlendi."}
+            await query.answer(txt.get(status, "Kaydedildi."), show_alert=True)
+
+        # Bulk mesajını güncelle
+        try:
+            await context.bot.edit_message_text(
+                chat_id=GROUP_CHAT_ID, message_id=query.message.message_id,
+                text=build_bulk_status(user.id, date),
+                reply_markup=bulk_keyboard(date), parse_mode="Markdown"
+            )
+        except BadRequest:
+            pass
+        return
+
+    # ── Normal namaz butonu
     if parts[0] != "pray":
         return
 
     _, status, prayer_key = parts
     user  = query.from_user
     date  = datetime.now(tz).date().isoformat()
+
+    # Zaten aynı statüde kayıt varsa tekrar sayma
+    existing = db.get_user_prayer_status(user.id, prayer_key, date)
+    if existing == status:
+        await query.answer("Zaten bu şekilde işaretlendi.", show_alert=False)
+        return
 
     db.record_prayer(user.id, user.username or user.first_name,
                      user.first_name, prayer_key, status, date)
@@ -202,7 +267,22 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except BadRequest:
             pass
 
-# ── Günlük rapor ──────────────────────────────────────────────────────────────
+# ── Bulk durum metni ──────────────────────────────────────────────────────────
+
+def build_bulk_status(user_id, date):
+    rows       = db.get_user_today_detail(user_id, date)
+    status_map = {r["prayer_key"]: r["status"] for r in rows}
+    lines      = [f"📝 *Toplu Namaz Girişi — {date}*\n"]
+    for pk in PRAYER_ORDER:
+        name   = PRAYER_NAMES[pk]
+        status = status_map.get(pk)
+        icon   = {"kildi": "✅", "kaza": "🔄", "kilmadi": "❌"}.get(status, "⬜")
+        lines.append(f"{icon} {name}")
+    done = sum(1 for s in status_map.values() if s in ("kildi", "kaza"))
+    lines.append(f"\n{progress(done)} *{done}/5*")
+    return "\n".join(lines)
+
+# ── Raporlar ──────────────────────────────────────────────────────────────────
 
 async def send_daily_report(context: ContextTypes.DEFAULT_TYPE):
     date    = datetime.now(tz).date().isoformat()
@@ -222,8 +302,6 @@ async def send_daily_report(context: ContextTypes.DEFAULT_TYPE):
             lines.append(f"\n_{random.choice(TESELLI)}_")
             break
     await context.bot.send_message(GROUP_CHAT_ID, "\n".join(lines), parse_mode="Markdown")
-
-# ── Haftalık rapor ────────────────────────────────────────────────────────────
 
 async def send_weekly_report(context: ContextTypes.DEFAULT_TYPE):
     today      = datetime.now(tz).date()
@@ -258,8 +336,6 @@ async def send_weekly_report(context: ContextTypes.DEFAULT_TYPE):
     if champ_name and best_perfect > 0:
         lines.append(f"🏆 *Haftanın Şampiyonu: {champ_name}!* ({best_perfect} tam gün)")
     await context.bot.send_message(GROUP_CHAT_ID, "\n".join(lines), parse_mode="Markdown")
-
-# ── Aylık rapor ───────────────────────────────────────────────────────────────
 
 async def send_monthly_report(context: ContextTypes.DEFAULT_TYPE):
     today     = datetime.now(tz).date()
@@ -296,15 +372,14 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🕌 *Namaz Takip Botu Aktif!*\n\n"
         "📬 Her namaz vaktinde bildirim\n"
         "⏰ 1 saat önce hatırlatma\n"
+        "🔔 Vakit girdikten 30 dk sonra hatırlatma\n"
         "🔴 30 dk önce sert uyarı\n"
         "👥 Herkesin durumu anlık görünür\n"
         "🔥 Streak takibi\n"
-        "🏆 Haftalık şampiyon rozeti\n"
-        "📊 Gece 00:00 günlük rapor\n"
-        "📅 Pazar 23:59 haftalık rapor\n"
-        "📆 Her ayın sonu aylık rapor\n\n"
+        "🏆 Haftalık şampiyon rozeti\n\n"
         "/rapor — Bugünkü durum\n"
         "/bugun — Bugün ne kıldım?\n"
+        "/ekle — Toplu namaz girişi (unutanlar için)\n"
         "/haftalik — Bu haftanın raporu\n"
         "/aylik — Bu ayın raporu\n"
         "/benim — Kendi istatistiklerim\n"
@@ -326,29 +401,32 @@ async def cmd_rapor(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
 async def cmd_bugun(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Kullanıcının bugün hangi vakitleri kıldığını göster."""
     user  = update.effective_user
     date  = datetime.now(tz).date().isoformat()
     rows  = db.get_user_today_detail(user.id, date)
     status_map = {r["prayer_key"]: r["status"] for r in rows}
-
     lines = [f"🕌 *Bugünkü Namazların — {user.first_name}*\n"]
     for pk in PRAYER_ORDER:
         name   = PRAYER_NAMES[pk]
         status = status_map.get(pk)
-        if status == "kildi":
-            icon, txt = "✅", "Kıldım"
-        elif status == "kaza":
-            icon, txt = "🔄", "Kaza"
-        elif status == "kilmadi":
-            icon, txt = "❌", "Kılmadım"
-        else:
-            icon, txt = "⬜", "Henüz işaretlenmedi"
+        if status == "kildi":       icon, txt = "✅", "Kıldım"
+        elif status == "kaza":      icon, txt = "🔄", "Kaza"
+        elif status == "kilmadi":   icon, txt = "❌", "Kılmadım"
+        else:                       icon, txt = "⬜", "Henüz işaretlenmedi"
         lines.append(f"{icon} {name}: _{txt}_")
-
     done = sum(1 for s in status_map.values() if s in ("kildi", "kaza"))
     lines.append(f"\n{progress(done)} *{done}/5*")
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+async def cmd_ekle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Toplu namaz girişi — unutanlar için."""
+    user = update.effective_user
+    date = datetime.now(tz).date().isoformat()
+    await update.message.reply_text(
+        build_bulk_status(user.id, date),
+        reply_markup=bulk_keyboard(date),
+        parse_mode="Markdown"
+    )
 
 async def cmd_haftalik(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_weekly_report(context)
@@ -397,10 +475,11 @@ def _schedule_day(app):
         ts = times.get(pk)
         if not ts:
             continue
-        h, m        = map(int, ts.split(":"))
-        prayer_dt   = tz.localize(datetime.combine(now.date(), time(h, m)))
-        remind_dt   = prayer_dt - timedelta(hours=1)
-        urgent_dt   = prayer_dt - timedelta(minutes=30)
+        h, m      = map(int, ts.split(":"))
+        prayer_dt = tz.localize(datetime.combine(now.date(), time(h, m)))
+        remind_dt = prayer_dt - timedelta(hours=1)
+        urgent_dt = prayer_dt - timedelta(minutes=30)
+        post_dt   = prayer_dt + timedelta(minutes=30)  # vakit girdikten 30 dk sonra
 
         if prayer_dt > now:
             app.job_queue.run_once(
@@ -417,11 +496,16 @@ def _schedule_day(app):
                 send_urgent_reminder, when=urgent_dt,
                 data={"prayer_key": pk, "prayer_time_str": ts}, name=f"urgent_{pk}"
             )
+        if post_dt > now:
+            app.job_queue.run_once(
+                send_post_prayer_reminder, when=post_dt,
+                data={"prayer_key": pk, "prayer_time_str": ts}, name=f"post_{pk}"
+            )
     logger.info("Günlük vakitler zamanlandı.")
 
 async def reschedule_daily(context: ContextTypes.DEFAULT_TYPE):
     for job in context.application.job_queue.jobs():
-        if job.name and any(job.name.startswith(p) for p in ("prayer_", "reminder_", "urgent_")):
+        if job.name and any(job.name.startswith(p) for p in ("prayer_","reminder_","urgent_","post_")):
             job.schedule_removal()
     _schedule_day(context.application)
 
@@ -429,12 +513,12 @@ def schedule_prayers(app):
     _schedule_day(app)
     now           = datetime.now(tz)
     next_midnight = tz.localize(datetime.combine(now.date(), time(0, 0))) + timedelta(days=1)
-    app.job_queue.run_once(send_daily_report, when=next_midnight, name="daily_report_once")
-    app.job_queue.run_daily(reschedule_daily,    time=time(0, 1,  tzinfo=tz), name="reschedule")
-    app.job_queue.run_daily(send_daily_report,   time=time(0, 0,  tzinfo=tz), name="daily_report")
+    app.job_queue.run_once(send_daily_report,    when=next_midnight,               name="daily_report_once")
+    app.job_queue.run_daily(reschedule_daily,    time=time(0, 1,  tzinfo=tz),      name="reschedule")
+    app.job_queue.run_daily(send_daily_report,   time=time(0, 0,  tzinfo=tz),      name="daily_report")
     app.job_queue.run_daily(send_weekly_report,  time=time(23, 59, tzinfo=tz), days=(6,), name="weekly_report")
     app.job_queue.run_daily(send_monthly_report, time=time(23, 58, tzinfo=tz), days=(6,), name="monthly_check")
-    app.job_queue.run_daily(send_friday_reminder, time=time(9, 0, tzinfo=tz), days=(4,), name="friday_reminder")
+    app.job_queue.run_daily(send_friday_reminder,time=time(9, 0,  tzinfo=tz),  days=(4,), name="friday_reminder")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
@@ -444,6 +528,7 @@ async def main():
     app.add_handler(CommandHandler("start",    cmd_start))
     app.add_handler(CommandHandler("rapor",    cmd_rapor))
     app.add_handler(CommandHandler("bugun",    cmd_bugun))
+    app.add_handler(CommandHandler("ekle",     cmd_ekle))
     app.add_handler(CommandHandler("haftalik", cmd_haftalik))
     app.add_handler(CommandHandler("aylik",    cmd_aylik))
     app.add_handler(CommandHandler("benim",    cmd_benim))
