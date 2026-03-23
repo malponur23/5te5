@@ -153,6 +153,16 @@ class Database:
             """, (prayer_key, date, message_id, prayer_time_str, int(is_reminder)))
             conn.commit()
 
+    def get_user_today_detail(self, user_id, date):
+        """Kullanıcının bugün hangi vakitleri kıldığını döner."""
+        with self._conn() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT prayer_key, status FROM prayers
+                WHERE user_id=? AND date=?
+            """, (user_id, date)).fetchall()
+        return [dict(r) for r in rows]
+
     def get_notification_messages(self, prayer_key, date):
         with self._conn() as conn:
             conn.row_factory = sqlite3.Row
