@@ -42,7 +42,14 @@ TESELLI = [
     "Allah affedicidir, bir sonrakinde daha dikkatli ol! 🌙",
 ]
 
-AYET_UYARILARI = [
+HARAM_BAKIS_MESAJLARI = [
+    '👁️ *"Mü\'minlere söyle: Gözlerini haramdan sakınsınlar."*\n_(Nur Suresi, 30)_',
+    '👁️ *"Zina eden göz, harama bakmaktır."*\n_(Hadis-i Şerif, Müslim)_',
+    '👁️ *"İlk bakış sana, ikincisi aleyhinedir."*\n_(Hadis-i Şerif, Ebu Davud)_',
+    '👁️ *"Gözler de zina eder; onların zinası bakmaktır."*\n_(Hadis-i Şerif, Buhari)_',
+    '👁️ *"Kim Allah korkusundan dolayı bir harama bakmaktan gözünü çekerse, Allah ona imanın lezzetini tattırır."*\n_(Hadis-i Şerif)_',
+    '👁️ Harama bakmak kalbi karartır. Gözünü koru, kalbini koru. 🤲',
+]
     '⚠️ *"Yazıklar olsun o namaz kılanlara ki, namazlarından gafildirler."*\n_(Maun 4-5)_\n\nHenüz işaretlemedin! Namazını kıldıysan işaretle 👇',
     '⚠️ *"Sizi şu yanık ateşe ne sürükledi? Biz namaz kılanlardan değildik."*\n_(Müddessir 42-43)_\n\nNamazını kılmadıysan hâlâ vakit var! 👇',
     '⚠️ *"Namazı terk etmek, küfür ile şirk arasındaki sınırdır."*\n_(Hadis-i Şerif)_\n\nBu namazı kaçırma! 👇',
@@ -226,6 +233,14 @@ async def send_post_prayer_reminder(context: ContextTypes.DEFAULT_TYPE):
         reply_markup=keyboard(pk), parse_mode="Markdown"
     )
     db.save_notification_message(pk, date, msg.message_id, pts, False)
+
+async def send_haram_reminder(context: ContextTypes.DEFAULT_TYPE):
+    msg = random.choice(HARAM_BAKIS_MESAJLARI)
+    await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID,
+        text=msg,
+        parse_mode="Markdown"
+    )
 
 async def send_friday_reminder(context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
@@ -571,6 +586,10 @@ def schedule_prayers(app):
     app.job_queue.run_daily(send_weekly_report,  time=time(23, 59, tzinfo=tz), days=(6,), name="weekly_report")
     app.job_queue.run_daily(send_monthly_report, time=time(23, 58, tzinfo=tz), days=(6,), name="monthly_check")
     app.job_queue.run_daily(send_friday_reminder,time=time(9, 0,  tzinfo=tz),  days=(4,), name="friday_reminder")
+    # Harama bakış hatırlatması — günde 3 kez (sabah, öğle arası, gece)
+    app.job_queue.run_daily(send_haram_reminder, time=time(10, 0, tzinfo=tz), name="haram_reminder_1")
+    app.job_queue.run_daily(send_haram_reminder, time=time(15, 0, tzinfo=tz), name="haram_reminder_2")
+    app.job_queue.run_daily(send_haram_reminder, time=time(21, 0, tzinfo=tz), name="haram_reminder_3")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
