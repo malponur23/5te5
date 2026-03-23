@@ -50,6 +50,8 @@ HARAM_BAKIS_MESAJLARI = [
     '👁️ *"Kim Allah korkusundan dolayı bir harama bakmaktan gözünü çekerse, Allah ona imanın lezzetini tattırır."*\n_(Hadis-i Şerif)_',
     '👁️ Harama bakmak kalbi karartır. Gözünü koru, kalbini koru. 🤲',
 ]
+
+AYET_UYARILARI = [
     '⚠️ *"Yazıklar olsun o namaz kılanlara ki, namazlarından gafildirler."*\n_(Maun 4-5)_\n\nHenüz işaretlemedin! Namazını kıldıysan işaretle 👇',
     '⚠️ *"Sizi şu yanık ateşe ne sürükledi? Biz namaz kılanlardan değildik."*\n_(Müddessir 42-43)_\n\nNamazını kılmadıysan hâlâ vakit var! 👇',
     '⚠️ *"Namazı terk etmek, küfür ile şirk arasındaki sınırdır."*\n_(Hadis-i Şerif)_\n\nBu namazı kaçırma! 👇',
