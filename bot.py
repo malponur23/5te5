@@ -301,16 +301,31 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     _, status, prayer_key = parts
-    user  = query.from_user
-    date  = datetime.now(tz).date().isoformat()
+    user   = query.from_user
+    now_dt = datetime.now(tz)
+
+    # Gece yarısından sonra (00:00-02:00) Yatsı için önceki günün tarihi
+    if prayer_key == "Isha" and now_dt.hour < 2:
+        date = (now_dt.date() - timedelta(days=1)).isoformat()
+    else:
+        date = now_dt.date().isoformat()
 
     # Vakti gelmediyse butona basılamaz
+    # Yatsı için gece yarısı sonrası 02:00'ye kadar izin ver
     times = get_prayer_times_today()
-    ts    = times.get(prayer_key)
+    now_dt = datetime.now(tz)
+    ts = times.get(prayer_key)
     if ts:
         h, m = map(int, ts.split(":"))
-        prayer_dt = tz.localize(datetime.combine(datetime.now(tz).date(), time(h, m)))
-        if datetime.now(tz) < prayer_dt:
+        prayer_dt = tz.localize(datetime.combine(now_dt.date(), time(h, m)))
+
+        # Gece yarısından sonra (00:00-02:00) Yatsı için önceki günün vaktini kontrol et
+        if prayer_key == "Isha" and now_dt.hour < 2:
+            yesterday = (now_dt.date() - timedelta(days=1))
+            times_yesterday = get_prayer_times_today()  # aynı API, dün için
+            prayer_dt = tz.localize(datetime.combine(yesterday, time(h, m)))
+
+        if now_dt < prayer_dt:
             prayer_name = PRAYER_NAMES[prayer_key]
             await query.answer(
                 f"⏳ {prayer_name} vakti henüz girmedi! ({ts})",
@@ -589,14 +604,12 @@ async def reschedule_daily(context: ContextTypes.DEFAULT_TYPE):
 
 def schedule_prayers(app):
     _schedule_day(app)
-    now           = datetime.now(tz)
-    next_midnight = tz.localize(datetime.combine(now.date(), time(0, 0))) + timedelta(days=1)
-    app.job_queue.run_once(send_daily_report,    when=next_midnight,               name="daily_report_once")
-    app.job_queue.run_daily(reschedule_daily,    time=time(0, 1,  tzinfo=tz),      name="reschedule")
-    app.job_queue.run_daily(send_daily_report,   time=time(0, 0,  tzinfo=tz),      name="daily_report")
-    app.job_queue.run_daily(send_weekly_report,  time=time(23, 59, tzinfo=tz), days=(6,), name="weekly_report")
-    app.job_queue.run_daily(send_monthly_report, time=time(23, 58, tzinfo=tz), days=(6,), name="monthly_check")
-    app.job_queue.run_daily(send_friday_reminder,time=time(9, 0,  tzinfo=tz),  days=(4,), name="friday_reminder")
+    now = datetime.now(tz)
+    app.job_queue.run_daily(reschedule_daily,    time=time(0,  1,  tzinfo=tz),      name="reschedule")
+    app.job_queue.run_daily(send_daily_report,   time=time(23, 59, tzinfo=tz),      name="daily_report")
+    app.job_queue.run_daily(send_weekly_report,  time=time(23, 55, tzinfo=tz), days=(6,), name="weekly_report")
+    app.job_queue.run_daily(send_monthly_report, time=time(23, 57, tzinfo=tz), days=(6,), name="monthly_check")
+    app.job_queue.run_daily(send_friday_reminder,time=time(9,  0,  tzinfo=tz), days=(4,), name="friday_reminder")
     # Harama bakış hatırlatması — gündüz 3, akşam 4 (18:00 sonrası sık)
     app.job_queue.run_daily(send_haram_reminder, time=time(9,  0, tzinfo=tz), name="haram_reminder_1")
     app.job_queue.run_daily(send_haram_reminder, time=time(12, 0, tzinfo=tz), name="haram_reminder_2")
