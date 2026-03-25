@@ -67,6 +67,71 @@ AYET_UYARILARI = [
     '⚠️ *"Kıyamet günü kulun ilk hesaba çekileceği ameli namazdır."*\n_(Hadis-i Şerif)_\n\nVakit geçmeden kıl veya işaretle! 👇',
 ]
 
+SABAH_DUALARI = [
+    '🌅 *Günaydın!*\n\n*Sabah Duası:*\n_"Allahümme bike asbahnâ ve bike emseynâ ve bike nahyâ ve bike nemûtü ve ileyken-nüşûr."_\n\n"Allah\'ım! Senin adınla sabahladık, senin adınla akşamladık, senin adınla yaşar ve senin adınla ölürüz. Dönüş de sanadır." 🤲',
+    '🌅 *Günaydın!*\n\n*Sabah Duası:*\n_"Allahümme innî es\'elüke ilmen nâfi\'an ve rızkan tayyiben ve amelen mütekabbelen."_\n\n"Allah\'ım! Senden faydalı ilim, temiz rızık ve kabul edilmiş amel istiyorum." 🤲',
+    '🌅 *Günaydın!*\n\nYeni bir güne uyanmak Allah\'ın nimeti. Bugün 5 vakit namazımızı eksiksiz kılalım inşallah! 🕌\n\n_"Sabah namazını kılan kimse Allah\'ın himayesindedir."_ (Müslim)',
+    '🌅 *Günaydın!*\n\n*Sabah Tesbihâtı:*\nSübhanallah (33)\nElhamdülillah (33)\nAllahuekber (33)\n\nGünün bereketli başlasın! 🤲',
+    '🌅 *Günaydın!*\n\n_"Her sabah iki melek iner. Biri: \'Allah\'ım, infak edene karşılık ver.\' Diğeri: \'Allah\'ım, cimrinin malını yok et\' der."_ (Buhari)\n\nHayırlı bir gün olsun! 🌟',
+    '🌅 *Günaydın!*\n\n*Ayetel Kürsi* ile güne başla:\n_"Allahü lâ ilâhe illâ hüvel hayyül kayyûm..."_\n\nSabah okunan Ayetel Kürsi akşama kadar korur. 🛡️',
+    '🌅 *Günaydın!*\n\n_"Kim sabah namazını cemaatle kılarsa, sonra oturup Allah\'ı zikrederek güneş doğana kadar beklerse, sonra iki rekat namaz kılarsa, bu ona tam bir hac ve umre sevabı gibi olur."_ (Tirmizi)\n\nHayırlı sabahlar! 🌅',
+]
+
+AKSAM_DUALARI = [
+    '🌙 *İyi Geceler!*\n\n*Yatmadan Önce Okunacak Dua:*\n_"Allahümme bismike emûtü ve ahyâ."_\n\n"Allah\'ım! Senin adınla ölür (uyur) ve senin adınla dirilir (uyanırım)." 🤲',
+    '🌙 *İyi Geceler!*\n\nYatmadan önce *3 kez İhlâs, Felak ve Nâs* surelerini oku, avuçlarına üfle ve tüm vücuduna süpür. Peygamberimizin (s.a.v.) sünneti. 🛡️',
+    '🌙 *İyi Geceler!*\n\n_"Kim yatağına girdiğinde 33 Sübhanallah, 33 Elhamdülillah, 34 Allahuekber derse bu onun için hizmetçiden daha hayırlıdır."_ (Buhari)\n\nUnutma! 🤲',
+    '🌙 *İyi Geceler!*\n\n*Akşam Duası:*\n_"Allahümme bike emseynâ ve bike asbahnâ ve bike nahyâ ve bike nemûtü ve ileyken-nüşûr."_\n\nHayırlı geceler! 🌙',
+    '🌙 *İyi Geceler!*\n\nYatmadan önce bugünün muhasebesini yap:\n✅ Kaç vakit namaz kıldın?\n🤲 Kaç kişiye iyilik ettin?\n📖 Kuran okudun mu?\n\nYarın daha iyi ol! 💪',
+]
+
+GUNUN_HADISLERI = [
+    '📚 *Günün Hadisi*\n\n_"Amellerin en hayırlısı, az da olsa devamlı olanıdır."_\n_(Buhari, Müslim)_',
+    '📚 *Günün Hadisi*\n\n_"Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz."_\n_(Buhari)_',
+    '📚 *Günün Hadisi*\n\n_"Güçlü kimse güreşte yenen değil, öfke anında nefsine hâkim olandır."_\n_(Buhari, Müslim)_',
+    '📚 *Günün Hadisi*\n\n_"Komşusu açken tok yatan bizden değildir."_\n_(Hakim)_',
+    '📚 *Günün Hadisi*\n\n_"Müslüman, dilinden ve elinden diğer Müslümanların güvende olduğu kimsedir."_\n_(Buhari)_',
+    '📚 *Günün Hadisi*\n\n_"Temizlik imanın yarısıdır."_\n_(Müslim)_',
+    '📚 *Günün Hadisi*\n\n_"Bir kimse din kardeşinin ihtiyacını giderirse Allah da onun ihtiyacını giderir."_\n_(Buhari, Müslim)_',
+    '📚 *Günün Hadisi*\n\n_"Gülümsemen kardeşinin yüzüne sadakadır."_\n_(Tirmizi)_',
+    '📚 *Günün Hadisi*\n\n_"Şüphesiz Allah, işini sağlam yapmanızı sever."_\n_(Taberani)_',
+    '📚 *Günün Hadisi*\n\n_"Ana-babana iyilik et ki, çocukların da sana iyilik etsin."_\n_(Taberani)_',
+    '📚 *Günün Hadisi*\n\n_"İnsanlara teşekkür etmeyen, Allah\'a şükretmemiş olur."_\n_(Ebu Davud)_',
+    '📚 *Günün Hadisi*\n\n_"Kişinin değersiz şeyleri terk etmesi İslam\'ının güzelliğindendir."_\n_(Tirmizi)_',
+    '📚 *Günün Hadisi*\n\n_"Birbirinizi sevmedikçe iman etmiş olmazsınız."_\n_(Müslim)_',
+    '📚 *Günün Hadisi*\n\n_"Cennet annelerin ayakları altındadır."_\n_(Nesai)_',
+    '📚 *Günün Hadisi*\n\n_"İlim öğrenmek her Müslümana farzdır."_\n_(İbn Mace)_',
+]
+
+GUNUN_AYETLERI = [
+    '📖 *Günün Ayeti*\n\n_"Şüphesiz namaz, mü\'minlere belirli vakitlerde farz kılınmıştır."_\n_(Nisa Suresi, 103)_',
+    '📖 *Günün Ayeti*\n\n_"Sabredenlerle birlikte olun. Şüphesiz Allah sabredenlerle beraberdir."_\n_(Bakara Suresi, 153)_',
+    '📖 *Günün Ayeti*\n\n_"Güçlük ile birlikte kolaylık vardır. Evet, güçlük ile birlikte kolaylık vardır."_\n_(İnşirah Suresi, 5-6)_',
+    '📖 *Günün Ayeti*\n\n_"Allah\'ı çok zikredin ki kurtuluşa eresiniz."_\n_(Enfal Suresi, 45)_',
+    '📖 *Günün Ayeti*\n\n_"Rabb\'iniz şöyle buyurdu: Bana dua edin, duanızı kabul edeyim."_\n_(Mümin Suresi, 60)_',
+    '📖 *Günün Ayeti*\n\n_"Allah, hiçbir nefse taşıyabileceğinden fazla yük yüklemez."_\n_(Bakara Suresi, 286)_',
+    '📖 *Günün Ayeti*\n\n_"Şüphesiz Allah, adaleti, iyilik yapmayı ve akrabaya bakmayı emreder."_\n_(Nahl Suresi, 90)_',
+    '📖 *Günün Ayeti*\n\n_"Kim Allah\'a tevekkül ederse Allah ona yeter."_\n_(Talak Suresi, 3)_',
+    '📖 *Günün Ayeti*\n\n_"Andolsun ki sizi biraz korku, açlık ve mallardan, canlardan, ürünlerden eksiltme ile deneriz. Sabredenleri müjdele."_\n_(Bakara Suresi, 155)_',
+    '📖 *Günün Ayeti*\n\n_"Şüphesiz namaz, hayâsızlıktan ve kötülükten alıkoyar."_\n_(Ankebut Suresi, 45)_',
+    '📖 *Günün Ayeti*\n\n_"Sabır ve namazla yardım isteyin. Şüphesiz bu, huşu sahiplerine ağır gelmez."_\n_(Bakara Suresi, 45)_',
+    '📖 *Günün Ayeti*\n\n_"O halde beni anın ki ben de sizi anayım."_\n_(Bakara Suresi, 152)_',
+    '📖 *Günün Ayeti*\n\n_"Rabbinin ismini an ve her şeyden kesilip yalnız O\'na yönel."_\n_(Müzzemmil Suresi, 8)_',
+    '📖 *Günün Ayeti*\n\n_"Şüphesiz Allah, tövbe edenleri sever ve temizlenenleri sever."_\n_(Bakara Suresi, 222)_',
+    '📖 *Günün Ayeti*\n\n_"İyi bir söz, kökü sabit ve dalları göğe yükselen güzel bir ağaç gibidir."_\n_(İbrahim Suresi, 24)_',
+]
+
+KANDIL_GUNLERI = {
+    "03-01": "🌙 *Regaib Kandili Mübarek Olsun!*\n\nBu gece dua ve ibadet gecesidir. Namazlarınızı aksatmayın! 🤲",
+    "03-27": "🌙 *Miraç Kandili Mübarek Olsun!*\n\nHz. Peygamber\'in (s.a.v.) Allah\'a yükseldiği o mübarek gece. Namazlarınızı kılın! 🕌",
+    "04-17": "🌙 *Berat Kandili Mübarek Olsun!*\n\nBu gece dualar kabul edilir, günahlar affedilir. Çokça dua edin! 🤲",
+    "03-11": "🌙 *Ramazan Ayı Başlıyor!*\n\nHayırlı Ramazanlar! Bu mübarek ayda namazlarımızı eksiksiz kılalım. 🌙",
+    "04-09": "🌙 *Kadir Gecesi Mübarek Olsun!*\n\n_\"Kadir gecesi bin aydan daha hayırlıdır.\"_ (Kadr, 3)\n\nBu gece çokça ibadet edin! 🤲",
+    "04-10": "🎉 *Ramazan Bayramı Mübarek Olsun!*\n\nEid Mubarak! Bayram namazını kılmayı unutmayın! 🕌",
+    "06-17": "🎉 *Kurban Bayramı Mübarek Olsun!*\n\nBayramınız mübarek olsun! Bayram namazını kılmayı unutmayın! 🕌",
+    "09-27": "🌙 *Hz. Peygamber\'in Doğum Yıldönümü - Mevlid Kandili Mübarek Olsun!*\n\nO\'na salat ve selam olsun. 🤲",
+}
+
 # ── Yardımcılar ──────────────────────────────────────────────────────────────
 
 def keyboard(prayer_key):
@@ -260,6 +325,52 @@ async def send_friday_reminder(context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
+async def send_sabah_duasi(context: ContextTypes.DEFAULT_TYPE):
+    today = datetime.now(tz).date().timetuple().tm_yday
+    msg = SABAH_DUALARI[today % len(SABAH_DUALARI)]
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=msg, parse_mode="Markdown")
+
+async def send_aksam_duasi(context: ContextTypes.DEFAULT_TYPE):
+    today = datetime.now(tz).date().timetuple().tm_yday
+    msg = AKSAM_DUALARI[today % len(AKSAM_DUALARI)]
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=msg, parse_mode="Markdown")
+
+async def send_gunun_hadisi(context: ContextTypes.DEFAULT_TYPE):
+    today = datetime.now(tz).date().timetuple().tm_yday
+    msg = GUNUN_HADISLERI[today % len(GUNUN_HADISLERI)]
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=msg, parse_mode="Markdown")
+
+async def send_gunun_ayeti(context: ContextTypes.DEFAULT_TYPE):
+    today = datetime.now(tz).date().timetuple().tm_yday
+    msg = GUNUN_AYETLERI[today % len(GUNUN_AYETLERI)]
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=msg, parse_mode="Markdown")
+
+async def send_kandil_check(context: ContextTypes.DEFAULT_TYPE):
+    """Her gün gece yarısından önce kandil/bayram kontrolü."""
+    today = datetime.now(tz).date().strftime("%m-%d")
+    if today in KANDIL_GUNLERI:
+        await context.bot.send_message(
+            chat_id=GROUP_CHAT_ID,
+            text=KANDIL_GUNLERI[today],
+            parse_mode="Markdown"
+        )
+
+async def send_eksik_hatirlatma(context: ContextTypes.DEFAULT_TYPE):
+    """Gün bitmeden eksik namazı olanları nazikçe hatırlat (21:00)."""
+    date    = datetime.now(tz).date().isoformat()
+    records = db.get_daily_summary(date)
+    if not records:
+        return
+    eksikler = [r["first_name"] for r in records if r["kildi"] + r["kaza"] < 5]
+    if not eksikler:
+        return
+    isimler = ", ".join(eksikler)
+    await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID,
+        text=f"🔔 *Hatırlatma!*\n\n{isimler} — bugün henüz tüm namazları tamamlamadı.\nGün bitmeden kılalım inşallah! 🕌",
+        parse_mode="Markdown"
+    )
+
 # ── Buton callback ────────────────────────────────────────────────────────────
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -349,6 +460,17 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     await query.answer(alerts.get(status, "Kaydedildi."), show_alert=True)
 
+    # 5/5 tamamladıysa gruba teşvik mesajı
+    if status in ("kildi", "kaza"):
+        today_detail = db.get_user_today_detail(user.id, date)
+        done = sum(1 for r in today_detail if r["status"] in ("kildi", "kaza"))
+        if done == 5:
+            await context.bot.send_message(
+                chat_id=GROUP_CHAT_ID,
+                text=f"🎉 *{user.first_name} bugün 5/5 tamamladı!*\nTebrikler, Allah kabul etsin! 🤲",
+                parse_mode="Markdown"
+            )
+
     for notif in db.get_notification_messages(prayer_key, date):
         try:
             await context.bot.edit_message_text(
@@ -410,6 +532,7 @@ async def send_weekly_report(context: ContextTypes.DEFAULT_TYPE):
     lines = ["📅 *Haftalık Namaz Raporu*",
              f"🗓 _{week_start.isoformat()} → {today.isoformat()}_\n"]
     best_perfect, champ_name = -1, ""
+    champ_count = 0
     for user_name, days in weekly.items():
         lines.append(f"👤 *{user_name}*")
         perfect = 0
@@ -428,9 +551,14 @@ async def send_weekly_report(context: ContextTypes.DEFAULT_TYPE):
         streak_txt = f"  🔥 {streak} gün streak!" if streak >= 2 else ""
         lines.append(f"   ⭐ Tam gün: *{perfect}/7*{streak_txt}\n")
         if perfect > best_perfect:
-            best_perfect, champ_name = perfect, user_name
-    if champ_name and best_perfect > 0:
-        lines.append(f"🏆 *Haftanın Şampiyonu: {champ_name}!* ({best_perfect} tam gün)")
+            best_perfect, champ_name, champ_count = perfect, user_name, 1
+        elif perfect == best_perfect:
+            champ_count += 1
+    if best_perfect > 0:
+        if champ_count == 1:
+            lines.append(f"🏆 *Haftanın Şampiyonu: {champ_name}!* ({best_perfect} tam gün)")
+        else:
+            lines.append(f"🤝 *Bu hafta şampiyon yok — herkes eşit!* ({best_perfect} tam gün)")
     await context.bot.send_message(GROUP_CHAT_ID, "\n".join(lines), parse_mode="Markdown")
 
 async def send_monthly_report(context: ContextTypes.DEFAULT_TYPE):
@@ -446,6 +574,7 @@ async def send_monthly_report(context: ContextTypes.DEFAULT_TYPE):
         return
     month_name = MONTH_TR.get(today.month, str(today.month))
     lines = [f"📆 *{today.year} {month_name} Aylık Rapor*\n"]
+    best_total, champ_name, champ_count = -1, "", 0
     for user_name, days in monthly.items():
         total_done, perfect_days = 0, 0
         for date_str in dates:
@@ -459,6 +588,16 @@ async def send_monthly_report(context: ContextTypes.DEFAULT_TYPE):
         lines.append(f"👤 *{user_name}*  {bar}\n"
                      f"   🟢 Tam gün: {perfect_days}/{len(dates)}\n"
                      f"   🕌 Toplam: {total_done}/{max_p}")
+        if perfect_days > best_total:
+            best_total, champ_name, champ_count = perfect_days, user_name, 1
+        elif perfect_days == best_total:
+            champ_count += 1
+
+    if best_total > 0:
+        if champ_count == 1:
+            lines.append(f"\n🏅 *Ayın Şampiyonu: {champ_name}!* ({best_total} tam gün) Tebrikler! 🎉")
+        else:
+            lines.append(f"\n🤝 *Bu ay şampiyon yok — herkes eşit!* ({best_total} tam gün)")
     await context.bot.send_message(GROUP_CHAT_ID, "\n".join(lines), parse_mode="Markdown")
 
 # ── Komutlar ──────────────────────────────────────────────────────────────────
@@ -622,7 +761,19 @@ def schedule_prayers(app):
     app.job_queue.run_daily(send_daily_report,   time=time(23, 59, tzinfo=tz),      name="daily_report")
     app.job_queue.run_daily(send_weekly_report,  time=time(23, 55, tzinfo=tz), days=(6,), name="weekly_report")
     app.job_queue.run_daily(send_monthly_report, time=time(23, 57, tzinfo=tz), days=(6,), name="monthly_check")
-    app.job_queue.run_daily(send_friday_reminder,time=time(9,  0,  tzinfo=tz), days=(4,), name="friday_reminder")
+    app.job_queue.run_daily(send_friday_reminder, time=time(9,  0,  tzinfo=tz), days=(4,), name="friday_reminder")
+    # Sabah duası 06:30
+    app.job_queue.run_daily(send_sabah_duasi,     time=time(6, 30, tzinfo=tz),             name="sabah_duasi")
+    # Günün hadisi 10:00
+    app.job_queue.run_daily(send_gunun_hadisi,    time=time(10, 0, tzinfo=tz),             name="gunun_hadisi")
+    # Günün ayeti 14:00
+    app.job_queue.run_daily(send_gunun_ayeti,     time=time(14, 0, tzinfo=tz),             name="gunun_ayeti")
+    # Eksik hatırlatma 21:30
+    app.job_queue.run_daily(send_eksik_hatirlatma,time=time(21,30, tzinfo=tz),             name="eksik_hatirlatma")
+    # Akşam duası 22:00
+    app.job_queue.run_daily(send_aksam_duasi,     time=time(22, 0, tzinfo=tz),             name="aksam_duasi")
+    # Kandil/bayram kontrolü her gün 08:00
+    app.job_queue.run_daily(send_kandil_check,    time=time(8,  0, tzinfo=tz),             name="kandil_check")
     # Harama bakış hatırlatması — gündüz 3, akşam 4 (18:00 sonrası sık)
     app.job_queue.run_daily(send_haram_reminder, time=time(9,  0, tzinfo=tz), name="haram_reminder_1")
     app.job_queue.run_daily(send_haram_reminder, time=time(12, 0, tzinfo=tz), name="haram_reminder_2")
