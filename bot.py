@@ -362,10 +362,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ── Bulk durum metni ──────────────────────────────────────────────────────────
 
-def build_bulk_status(user_id, date):
+def build_bulk_status_raw(user_id, date):
     rows       = db.get_user_today_detail(user_id, date)
     status_map = {r["prayer_key"]: r["status"] for r in rows}
-    lines      = [f"📝 *Toplu Namaz Girişi — {date}*\n"]
+    lines      = []
     for pk in PRAYER_ORDER:
         name   = PRAYER_NAMES[pk]
         status = status_map.get(pk)
@@ -374,6 +374,9 @@ def build_bulk_status(user_id, date):
     done = sum(1 for s in status_map.values() if s in ("kildi", "kaza"))
     lines.append(f"\n{progress(done)} *{done}/5*")
     return "\n".join(lines)
+
+def build_bulk_status(user_id, date):
+    return f"📝 *Toplu Namaz Girişi — {date}*\n\n" + build_bulk_status_raw(user_id, date)
 
 # ── Raporlar ──────────────────────────────────────────────────────────────────
 
@@ -512,11 +515,21 @@ async def cmd_bugun(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
 async def cmd_ekle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Toplu namaz girişi — unutanlar için."""
+    """Toplu namaz girişi — bugün veya dün için."""
     user = update.effective_user
-    date = datetime.now(tz).date().isoformat()
+    today = datetime.now(tz).date()
+
+    # /ekle dun → dünün tarihi
+    if context.args and context.args[0].lower() in ("dun", "dün"):
+        date = (today - timedelta(days=1)).isoformat()
+        baslik = "📝 *Dünkü Namaz Girişi*"
+    else:
+        date = today.isoformat()
+        baslik = "📝 *Bugünkü Namaz Girişi*"
+
+    text = baslik + f" — {date}\n\n" + build_bulk_status_raw(user.id, date)
     await update.message.reply_text(
-        build_bulk_status(user.id, date),
+        text,
         reply_markup=bulk_keyboard(date),
         parse_mode="Markdown"
     )
